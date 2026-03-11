@@ -1,0 +1,52 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Build files
+*.tar.gz
+
+# Temporary and test files
+*.tmp
+*.log
+test-*.js
+parse-*.js
+add-*.js
+build-*.js
+generate-*.js
+
+# Old versions
+index.html
+index-v2.html
+index-final.html
+index-fixed.html
+index-real.html
+index-all.html
+index-complete.html
+index-official-cn.html
+
+# Generated data files
+collected-items.json
+full-save-data.json
+save-data.json
+smithing-texts-complete.js
+item-database-full.js
+data-v2.js
+data.js
+parser.js
+parser-bin.js
+app.js
+chinese-translations.js
+official-chinese-db.js
+sample.json
+
+# Old docs
+README-TOOLS.md
+CHINESE-NAMES.md
+DATA-GUIDE.md
+PROJECT-SUMMARY.md
+QUICKSTART.md
+USAGE.md
