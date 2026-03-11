@@ -96,15 +96,10 @@ nioh2-tracker/
 ## 🎮 使用截图
 
 ### 主界面
-- 显示制作书/秘传书统计
-- 按类型分类（武器/防具/头盔/秘传书）
-- 支持搜索和过滤
+![主界面](screenshots/screenshot-main.png)
 
 ### 物品详情
-- 中文名称和ID
-- 掉落来源（BOSS、任务、敌人）
-- 解锁要求和备注
-- 已收集/未收集状态
+![物品详情](screenshots/screenshot-detail.png)
 
 ## 🔧 技术细节
 
