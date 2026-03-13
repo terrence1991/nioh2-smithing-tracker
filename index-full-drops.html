@@ -478,7 +478,8 @@
                         console.log('存档大小:', data.length, '字节');
 
                         // 解析物品栏
-                        // 存档存储格式不一致，需要双格式匹配
+                        // items-official.json 是大端模式，存档也是大端序存储
+                        // 读取公式：docId = (b0 << 8) | b1
                         const ITEM_START = 0x105EC8;
                         const ITEM_SIZE = 0x88;
                         const ITEM_SLOTS = 900;
@@ -490,15 +491,12 @@
 
                             if (b0 === 0 && b1 === 0) continue;
 
-                            // 尝试两种格式（大端序和小端序）
-                            const idBE = ((b0 << 8) | b1).toString(16).toUpperCase().padStart(4, '0');
-                            const idLE = ((b1 << 8) | b0).toString(16).toUpperCase().padStart(4, '0');
+                            // 大端序读取
+                            const docId = ((b0 << 8) | b1).toString(16).toUpperCase().padStart(4, '0');
                             
                             // 只添加已知的制作书ID
-                            if (smithingIdToIndex[idBE] !== undefined) {
-                                collectedIds.add(idBE);
-                            } else if (smithingIdToIndex[idLE] !== undefined) {
-                                collectedIds.add(idLE);
+                            if (smithingIdToIndex[docId] !== undefined) {
+                                collectedIds.add(docId);
                             }
                         }
 
