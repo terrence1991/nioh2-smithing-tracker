@@ -478,25 +478,27 @@
                         console.log('存档大小:', data.length, '字节');
 
                         // 解析物品栏
-                        // 存档是小端序存储：b0=低字节，b1=高字节
-                        // 文档ID是大端序数值 = (b1 << 8) | b0
+                        // 存档存储格式不一致，需要双格式匹配
                         const ITEM_START = 0x105EC8;
                         const ITEM_SIZE = 0x88;
                         const ITEM_SLOTS = 900;
 
                         for (let slot = 0; slot < ITEM_SLOTS; slot++) {
                             const offset = ITEM_START + (slot * ITEM_SIZE);
-                            const b0 = data[offset];      // 低字节
-                            const b1 = data[offset + 1];  // 高字节
+                            const b0 = data[offset];
+                            const b1 = data[offset + 1];
 
                             if (b0 === 0 && b1 === 0) continue;
 
-                            // 文档ID = 大端序数值
-                            const docId = ((b1 << 8) | b0).toString(16).toUpperCase().padStart(4, '0');
+                            // 尝试两种格式（大端序和小端序）
+                            const idBE = ((b0 << 8) | b1).toString(16).toUpperCase().padStart(4, '0');
+                            const idLE = ((b1 << 8) | b0).toString(16).toUpperCase().padStart(4, '0');
                             
                             // 只添加已知的制作书ID
-                            if (smithingIdToIndex[docId] !== undefined) {
-                                collectedIds.add(docId);
+                            if (smithingIdToIndex[idBE] !== undefined) {
+                                collectedIds.add(idBE);
+                            } else if (smithingIdToIndex[idLE] !== undefined) {
+                                collectedIds.add(idLE);
                             }
                         }
 
