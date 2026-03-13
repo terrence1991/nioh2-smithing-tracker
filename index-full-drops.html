@@ -3,333 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仁王2 制作书追踪器 (完整版)</title>
+    <title>Nioh 2 存档追踪器 - 含锻造厂数据</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: -apple-system, "Microsoft YaHei", sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #e0e0e0;
+            color: #e4e4e7;
+            padding: 20px;
             min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
             padding: 20px;
-        }
-        .container { max-width: 1600px; margin: 0 auto; }
-        
-        h1 {
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            background: linear-gradient(90deg, #f39c12, #e74c3c);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 30px;
-        }
-        
-        /* 上传区域 */
-        .upload-zone {
-            border: 3px dashed #4a4a6a;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-            transition: all 0.3s;
-            background: rgba(255,255,255,0.05);
-        }
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: #f39c12;
-            background: rgba(243,156,18,0.1);
-        }
-        .upload-zone input { display: none; }
-        .upload-icon { font-size: 4em; margin-bottom: 15px; }
-        
-        /* 统计卡片 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #2d2d4a 0%, #1a1a2e 100%);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid #3a3a5a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .stat-card h3 { color: #888; font-size: 0.9em; margin-bottom: 10px; }
-        .stat-card .number { font-size: 2.2em; font-weight: bold; }
-        .stat-card .progress { font-size: 0.85em; color: #888; margin-top: 5px; }
-        .stat-card.smithing .number { color: #e74c3c; }
-        .stat-card.skill .number { color: #f39c12; }
-        .stat-card.total .number { color: #2ecc71; }
-        
-        /* 控制栏 */
-        .controls {
+
+        .header h1 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .upload-section {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
             flex-wrap: wrap;
         }
-        .search-box {
+
+        .upload-box {
             flex: 1;
-            min-width: 250px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            background: #2d2d4a;
-            color: #e0e0e0;
-            font-size: 1em;
-        }
-        .search-box input::placeholder { color: #666; }
-        
-        .filter-btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 25px;
-            background: #2d2d4a;
-            color: #e0e0e0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .filter-btn:hover { background: #3d3d5a; }
-        .filter-btn.active { background: #f39c12; color: #1a1a2e; }
-        
-        /* 物品网格 */
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 15px;
-        }
-        .item-card {
-            background: linear-gradient(135deg, #2d2d4a 0%, #1a1a2e 100%);
+            min-width: 300px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(0, 212, 255, 0.3);
             border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-box:hover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .upload-box.dragover {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-title {
+            font-size: 18px;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .upload-desc {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
             padding: 20px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
         }
-        .item-card:hover { transform: translateY(-3px); border-color: #4a4a6a; }
-        .item-card.collected { 
-            border-color: #2ecc71; 
-            background: linear-gradient(135deg, #1e3a2e 0%, #1a2e1a 100%); 
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
         }
-        .item-card.collected::before {
-            content: '✓';
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: #2ecc71;
-            font-size: 1.5em;
+
+        .stat-card .number {
+            font-size: 36px;
             font-weight: bold;
-        }
-        
-        .item-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: flex-start; 
-            margin-bottom: 10px; 
-        }
-        .item-name { 
-            font-size: 1.1em; 
-            font-weight: bold; 
-            color: #f39c12; 
-            flex: 1;
-            margin-right: 10px;
-        }
-        .item-id { 
-            font-size: 0.8em; 
-            color: #666; 
-            background: #1a1a2e; 
-            padding: 3px 8px; 
-            border-radius: 5px; 
-            white-space: nowrap;
-        }
-        
-        .item-info { margin-bottom: 10px; }
-        .item-type { 
-            font-size: 0.9em; 
-            color: #888; 
             margin-bottom: 5px;
+        }
+
+        .stat-card .progress {
+            font-size: 14px;
+            color: #00d4ff;
+        }
+
+        .filters {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            justify-content: center;
         }
-        .item-category { 
-            display: inline-block; 
-            padding: 3px 10px; 
-            background: #3a3a5a; 
-            border-radius: 10px; 
-            font-size: 0.8em; 
-        }
-        
-        .item-drop {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(0,0,0,0.2);
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            border-left: 3px solid #f39c12;
-        }
-        .item-drop-label {
-            font-size: 0.85em;
-            color: #f39c12;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .item-drop-text {
-            font-size: 0.9em;
-            color: #ccc;
-            line-height: 1.5;
-            white-space: pre-line;
-        }
-        
-        .item-note {
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(52, 152, 219, 0.1);
-            border-radius: 8px;
-            font-size: 0.85em;
-            color: #5dade2;
-        }
-        
-        /* 按钮 */
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1em;
+            color: #e4e4e7;
             cursor: pointer;
-            transition: all 0.3s;
-            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
-        .btn-primary { background: linear-gradient(90deg, #f39c12, #e74c3c); color: white; }
-        .btn-secondary { background: #3a3a5a; color: #e0e0e0; }
-        .btn:hover { transform: scale(1.05); }
-        
-        .hidden { display: none; }
-        
-        /* 标签 */
+
+        .filter-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: #00d4ff;
+        }
+
+        .filter-btn.active {
+            background: #00d4ff;
+            color: #1a1a2e;
+            border-color: #00d4ff;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .item-card.collected {
+            border-color: rgba(0, 212, 255, 0.5);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .item-card.forged {
+            border-color: rgba(46, 204, 113, 0.5);
+            background: rgba(46, 204, 113, 0.05);
+        }
+
+        .item-card.collected.forged {
+            border-color: rgba(155, 89, 182, 0.5);
+            background: rgba(155, 89, 182, 0.05);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .item-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .item-id {
+            font-size: 12px;
+            color: #00d4ff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .item-info {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .item-category {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .badge-weapon {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .badge-armor {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+
+        .badge-helmet {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
         .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.75em;
-            margin-left: 5px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
         }
-        .badge-weapon { background: #e74c3c; }
-        .badge-armor { background: #3498db; }
-        .badge-helmet { background: #9b59b6; }
-        .badge-skill { background: #f39c12; }
-        .badge-dlc { background: #e67e22; }
-        
-        /* 分类标题 */
-        .category-header {
-            grid-column: 1 / -1;
-            padding: 15px 20px;
-            margin: 10px 0;
-            background: linear-gradient(90deg, #3a3a5a 0%, #2a2a4a 100%);
-            border-radius: 10px;
-            font-size: 1.3em;
+
+        .badge-dlc {
+            background: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+        }
+
+        .item-drop {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .item-drop-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .item-drop-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .item-note {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(241, 196, 15, 0.1);
+            border-radius: 6px;
+            font-size: 13px;
+            color: #f1c40f;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .section-title {
+            font-size: 24px;
             font-weight: bold;
-            color: #f39c12;
-            border-left: 4px solid #f39c12;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>仁王2 制作书追踪器</h1>
-        <p class="subtitle">官方中文 + 掉落信息 | 数据来源：QQ群539591455 + NiohWiki</p>
-        
-        <!-- 上传区域 -->
-        <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">📁</div>
-            <p style="font-size: 1.2em; margin-bottom: 10px;">拖拽存档文件到这里</p>
-            <p style="color: #888; margin-bottom: 20px;">支持 .json, .sav, .bin 格式</p>
-            <input type="file" id="fileInput" accept=".json,.sav,.bin,.BIN">
-            <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">选择文件</button>
-            <button class="btn btn-primary" onclick="loadSampleData()">加载示例数据</button>
+        <div class="header">
+            <h1>⚔️ 仁王 2 存档追踪器</h1>
+            <p style="color: #888; margin-top: 10px;">追踪道具栏制作书和锻造厂已解锁配方</p>
         </div>
-        
-        <!-- 统计 -->
-        <div class="stats-grid" id="statsGrid" style="display: none;">
-            <div class="stat-card smithing">
-                <h3>📜 制作书</h3>
-                <div class="number" id="smithingCount">0</div>
-                <div class="progress" id="smithingProgress">0 / 360</div>
+
+        <div class="upload-section">
+            <div class="upload-box" id="saveUpload">
+                <div class="upload-icon">📁</div>
+                <div class="upload-title">上传解密存档</div>
+                <div class="upload-desc">decr_SAVEDATA.BIN (游戏解密后的文件)</div>
             </div>
-            <div class="stat-card skill">
-                <h3>📖 秘传书</h3>
-                <div class="number" id="skillCount">0</div>
-                <div class="progress" id="skillProgress">0 / 35</div>
-            </div>
-            <div class="stat-card total">
-                <h3>✅ 总进度</h3>
-                <div class="number" id="totalCount">0</div>
-                <div class="progress" id="totalProgress">0%</div>
+            <div class="upload-box" id="htmlUpload">
+                <div class="upload-icon">🌐</div>
+                <div class="upload-title">或者查看完整列表</div>
+                <div class="upload-desc">不传文件，直接浏览全部制作书</div>
             </div>
         </div>
-        
-        <!-- 控制栏 -->
-        <div class="controls" id="controls" style="display: none;">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索名称、ID或掉落来源...">
+
+        <div id="results" class="hidden">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card smithing">
+                    <h3>📜 物品栏制作书</h3>
+                    <div class="number" id="smithingCount">0</div>
+                    <div class="progress" id="smithingProgress">0 / 365</div>
+                </div>
+                <div class="stat-card" style="--accent: #2ecc71;">
+                    <h3>⚒️ 锻造厂已解锁</h3>
+                    <div class="number" id="forgeCount" style="color: #2ecc71;">0</div>
+                    <div class="progress" id="forgeProgress">0 / 365</div>
+                </div>
+                <div class="stat-card skill">
+                    <h3>📖 秘传书</h3>
+                    <div class="number" id="skillCount">0</div>
+                    <div class="progress" id="skillProgress">0 / 35</div>
+                </div>
+                <div class="stat-card total">
+                    <h3>✅ 总进度</h3>
+                    <div class="number" id="totalCount">0</div>
+                    <div class="progress" id="totalProgress">0%</div>
+                </div>
             </div>
-            <button class="filter-btn active" data-filter="all">全部</button>
-            <button class="filter-btn" data-filter="weapon">武器</button>
-            <button class="filter-btn" data-filter="armor">防具</button>
-            <button class="filter-btn" data-filter="helmet">头盔</button>
-            <button class="filter-btn" data-filter="skill">秘传书</button>
-            <button class="filter-btn" data-filter="collected">已收集</button>
-            <button class="filter-btn" data-filter="missing">未收集</button>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: rgba(231, 76, 60, 0.5);"></div>
+                    <span>只在物品栏</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: rgba(46, 204, 113, 0.5);"></div>
+                    <span>锻造厂已解锁</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: rgba(155, 89, 182, 0.5);"></div>
+                    <span>物品栏 + 锻造厂</span>
+                </div>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="collected">物品栏</button>
+                <button class="filter-btn" data-filter="forged">锻造厂</button>
+                <button class="filter-btn" data-filter="weapon">武器</button>
+                <button class="filter-btn" data-filter="armor">防具</button>
+            </div>
+
+            <h2 class="section-title" id="smithingSection">制作书</h2>
+            <div class="items-grid" id="smithingGrid"></div>
+
+            <h2 class="section-title" id="skillSection">秘传书</h2>
+            <div class="items-grid" id="skillGrid"></div>
         </div>
-        
-        <!-- 物品列表 -->
-        <div class="items-grid" id="itemsGrid"></div>
     </div>
-    
-    <script src="official-chinese-names-complete.js"></script>
-    <script src="armor-smithing-drops.js"></script>
-    <script src="weapon-smithing-drops.js"></script>
+
+    <script src="smithing-drops-merged.js"></script>
     <script>
-        // 状态
+        // 全局变量
         let allItems = [];
         let collectedIds = new Set();
+        let forgedIds = new Set();
+        let smithingIdToIndex = {};
         let currentFilter = 'all';
-        
-        // 初始化物品列表
-        function initItems() {
+
+        // 锻造厂数据区域（限制到实际锻造厂数据范围）
+        const FORGE_START = 0x1b0000;
+        const FORGE_END = 0x1c0000;
+
+        // 初始化物品列表和ID映射
+        function initData() {
             allItems = [];
-            
-            // 制作书
-            Object.entries(SMITHING_TEXTS_CN || {}).forEach(([id, name]) => {
-                // 查找掉落信息（先查防具，再查武器）
-                let dropInfo = null;
-                
-                // 查防具
-                Object.entries(ARMOR_SMITHING_DATA || {}).forEach(([key, data]) => {
-                    if (data.id === id || data.name === name) {
-                        dropInfo = data;
-                    }
-                });
-                
-                // 查武器
-                if (!dropInfo) {
-                    Object.entries(WEAPON_SMITHING_DATA || {}).forEach(([key, data]) => {
-                        if (data.id === id || data.name === name) {
-                            dropInfo = data;
-                        }
-                    });
-                }
-                
-                // 确定类型
+            smithingIdToIndex = {};
+
+            // 提取制作书并排序
+            const smithingEntries = Object.entries(SMITHING_TEXTS_CN || {});
+            const sortedIds = smithingEntries.map(([id, name]) => parseInt(id, 16)).sort((a, b) => a - b);
+
+            // 创建 ID 到索引的映射
+            sortedIds.forEach((id, idx) => {
+                smithingIdToIndex[id.toString(16).toUpperCase().padStart(4, '0')] = idx;
+            });
+
+            // 处理制作书
+            smithingEntries.forEach(([id, name]) => {
                 let type = 'weapon';
                 let typeLabel = '武器';
+
                 if (name.includes('铠') || name.includes('装束') || name.includes('衣') || name.includes('甲')) {
                     type = 'armor';
                     typeLabel = '防具';
@@ -340,225 +442,256 @@
                     type = 'weapon';
                     typeLabel = '远程武器';
                 }
-                
+
                 allItems.push({
                     id: id,
                     name: name,
                     type: type,
                     typeLabel: typeLabel,
-                    drop: dropInfo?.drop || '未知',
-                    note: dropInfo?.note || ''
+                    category: 'smithing',
+                    forgeIndex: smithingIdToIndex[id]
                 });
             });
-            
-            // 秘传书
+
+            // 处理秘传书
             Object.entries(SKILL_BOOKS_CN || {}).forEach(([id, name]) => {
                 allItems.push({
                     id: id,
                     name: name,
                     type: 'skill',
-                    typeLabel: '秘传书',
-                    drop: '技能任务或BOSS掉落',
-                    note: ''
+                    typeLabel: '技能',
+                    category: 'skill'
                 });
             });
-            
-            console.log(`已加载 ${allItems.length} 个物品`);
+
+            console.log('已加载', allItems.length, '个物品');
+            console.log('锻造厂ID映射:', smithingIdToIndex);
         }
-        
-        // 渲染物品
-        function renderItems() {
-            const grid = document.getElementById('itemsGrid');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            let filtered = allItems.filter(item => {
-                // 搜索
-                if (searchTerm) {
-                    const searchFields = [item.name, item.id, item.drop, item.note].join(' ').toLowerCase();
-                    if (!searchFields.includes(searchTerm)) {
-                        return false;
+
+        // 解析存档
+        function parseSaveFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        console.log('存档大小:', data.length, '字节');
+
+                        // 解析物品栏
+                        const ITEM_START = 0x105EC8;
+                        const ITEM_SIZE = 0x88;
+                        const ITEM_SLOTS = 900;
+
+                        for (let slot = 0; slot < ITEM_SLOTS; slot++) {
+                            const offset = ITEM_START + (slot * ITEM_SIZE);
+                            const itemId = data[offset] | (data[offset + 1] << 8);
+
+                            if (itemId !== 0) {
+                                const idHex = ((itemId & 0xFF) << 8 | (itemId >> 8)).toString(16).toUpperCase().padStart(4, '0');
+                                collectedIds.add(idHex);
+                            }
+                        }
+
+                        console.log('物品栏制作书:', collectedIds.size, '个');
+
+                        // 解析锻造厂数据
+                        // 数据结构：每4字节存储一个ID（格式可能不一致）
+                        // 状态判断：周围有ff = 未解锁，无ff = 已解锁
+                        if (data.length > FORGE_END) {
+                            for (let offset = FORGE_START; offset < FORGE_END; offset += 4) {
+                                const b0 = data[offset];
+                                const b1 = data[offset + 1];
+                                
+                                // 跳过空记录
+                                if (b0 === 0 && b1 === 0) continue;
+                                if (b0 === 0xFF && b1 === 0xFF) continue;
+                                
+                                // 判断是否已解锁：检查周围是否有ff
+                                let isUnlocked = true;
+                                
+                                // 检查后续8字节是否有ff
+                                for (let j = offset + 4; j < offset + 12 && j < FORGE_END; j++) {
+                                    if (data[j] === 0xFF) {
+                                        isUnlocked = false;
+                                        break;
+                                    }
+                                }
+                                
+                                // 也检查前面是否有ff
+                                if (isUnlocked) {
+                                    for (let j = Math.max(FORGE_START, offset - 8); j < offset; j++) {
+                                        if (data[j] === 0xFF) {
+                                            isUnlocked = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (isUnlocked) {
+                                    // 尝试两种ID格式匹配（大端序和小端序）
+                                    const idBE = ((b0 << 8) | b1).toString(16).toUpperCase().padStart(4, '0');
+                                    const idLE = (b0 | (b1 << 8)).toString(16).toUpperCase().padStart(4, '0');
+                                    
+                                    if (smithingIdToIndex[idBE] !== undefined) {
+                                        forgedIds.add(idBE);
+                                    } else if (smithingIdToIndex[idLE] !== undefined) {
+                                        forgedIds.add(idLE);
+                                    }
+                                }
+                            }
+                            console.log('锻造厂已解锁:', forgedIds.size, '个');
+                        }
+
+                        resolve(data);
+                    } catch (err) {
+                        console.error('解析存档失败:', err);
+                        reject(err);
                     }
-                }
-                
-                // 过滤
-                const isCollected = collectedIds.has(item.id);
-                if (currentFilter === 'collected' && !isCollected) return false;
-                if (currentFilter === 'missing' && isCollected) return false;
-                if (currentFilter === 'weapon' && item.type !== 'weapon') return false;
-                if (currentFilter === 'armor' && item.type !== 'armor') return false;
-                if (currentFilter === 'helmet' && item.type !== 'helmet') return false;
-                if (currentFilter === 'skill' && item.type !== 'skill') return false;
-                
-                return true;
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
             });
-            
-            // 按类型分组
-            const grouped = {};
-            filtered.forEach(item => {
-                const group = item.type;
-                if (!grouped[group]) grouped[group] = [];
-                grouped[group].push(item);
-            });
-            
-            // 渲染
-            let html = '';
-            const groupOrder = ['weapon', 'armor', 'helmet', 'skill'];
-            const groupNames = {
-                weapon: '⚔️ 武器制作书',
-                armor: '🛡️ 防具制作书',
-                helmet: '🎭 头盔制作书',
-                skill: '📖 秘传书'
-            };
-            
-            groupOrder.forEach(group => {
-                if (grouped[group] && grouped[group].length > 0) {
-                    html += `<div class="category-header">${groupNames[group]} (${grouped[group].length})</div>`;
-                    
-                    grouped[group].forEach(item => {
-                        const isCollected = collectedIds.has(item.id);
-                        const badge = `badge-${item.type}`;
-                        const dlc = item.name.includes('DLC') ? '<span class="badge badge-dlc">DLC</span>' : '';
-                        
-                        html += `
-                            <div class="item-card ${isCollected ? 'collected' : ''}" data-id="${item.id}">
-                                <div class="item-header">
-                                    <span class="item-name">${item.name}</span>
-                                    <span class="item-id">${item.id}</span>
-                                </div>
-                                <div class="item-info">
-                                    <span class="item-category ${badge}">${item.typeLabel}</span>
-                                    ${dlc}
-                                </div>
-                                ${item.drop && item.drop !== '未知' ? `
-                                    <div class="item-drop">
-                                        <div class="item-drop-label">📍 掉落来源</div>
-                                        <div class="item-drop-text">${item.drop}</div>
-                                    </div>
-                                ` : ''}
-                                ${item.note ? `
-                                    <div class="item-note">💡 ${item.note}</div>
-                                ` : ''}
-                            </div>
-                        `;
-                    });
-                }
-            });
-            
-            grid.innerHTML = html;
-            updateStats();
         }
-        
-        // 更新统计
-        function updateStats() {
-            const smithingTotal = allItems.filter(i => i.type !== 'skill').length;
-            const skillTotal = allItems.filter(i => i.type === 'skill').length;
-            
-            const smithingCollected = allItems.filter(i => i.type !== 'skill' && collectedIds.has(i.id)).length;
-            const skillCollected = allItems.filter(i => i.type === 'skill' && collectedIds.has(i.id)).length;
-            
+
+        // 渲染统计
+        function renderStats() {
+            const smithingItems = allItems.filter(i => i.category === 'smithing');
+            const skillItems = allItems.filter(i => i.category === 'skill');
+
+            const smithingCollected = smithingItems.filter(i => collectedIds.has(i.id)).length;
+            const skillCollected = skillItems.filter(i => collectedIds.has(i.id)).length;
+            const smithingForged = smithingItems.filter(i => forgedIds.has(i.id)).length;
+            const skillForged = skillItems.filter(i => forgedIds.has(i.id)).length;
+
+            const smithingTotal = smithingItems.length;
+            const skillTotal = skillItems.length;
+
             document.getElementById('smithingCount').textContent = smithingCollected;
             document.getElementById('smithingProgress').textContent = `${smithingCollected} / ${smithingTotal}`;
-            
+
+            document.getElementById('forgeCount').textContent = smithingForged;
+            document.getElementById('forgeProgress').textContent = `${smithingForged} / ${smithingTotal}`;
+
             document.getElementById('skillCount').textContent = skillCollected;
             document.getElementById('skillProgress').textContent = `${skillCollected} / ${skillTotal}`;
-            
-            const total = smithingCollected + skillCollected;
-            const totalAll = smithingTotal + skillTotal;
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('totalProgress').textContent = `${Math.round(total/totalAll*100)}%`;
+
+            // 总进度 = 物品栏 + 锻造厂已解锁（去重）
+            const smithingCombined = smithingItems.filter(i => collectedIds.has(i.id) || forgedIds.has(i.id)).length;
+            const skillCombined = skillItems.filter(i => collectedIds.has(i.id) || forgedIds.has(i.id)).length;
+            const totalCombined = smithingCombined + skillCombined;
+            const totalTotal = smithingTotal + skillTotal;
+            const progress = Math.round((totalCombined / totalTotal) * 100);
+
+            document.getElementById('totalCount').textContent = totalCombined;
+            document.getElementById('totalProgress').textContent = progress + '%';
         }
-        
-        // 加载示例数据
-        function loadSampleData() {
-            collectedIds = new Set(['7D19', '5D29', '70D4', '1FD0', '4735', '05F4', 'CDAA', '82D7', 'F701']);
-            
-            document.getElementById('statsGrid').style.display = 'grid';
-            document.getElementById('controls').style.display = 'flex';
-            renderItems();
-        }
-        
-        // 文件上传处理
-        document.getElementById('uploadZone').addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.currentTarget.classList.add('dragover');
-        });
-        
-        document.getElementById('uploadZone').addEventListener('dragleave', (e) => {
-            e.currentTarget.classList.remove('dragover');
-        });
-        
-        document.getElementById('uploadZone').addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.currentTarget.classList.remove('dragover');
-            handleFile(e.dataTransfer.files[0]);
-        });
-        
-        document.getElementById('fileInput').addEventListener('change', (e) => {
-            handleFile(e.target.files[0]);
-        });
-        
-        function handleFile(file) {
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    
-                    try {
-                        const text = new TextDecoder().decode(data);
-                        const json = JSON.parse(text);
-                        parseJsonData(json);
-                    } catch {
-                        parseBinaryData(data);
+
+        // 渲染物品列表
+        function renderItems() {
+            const smithingItems = allItems.filter(i => i.category === 'smithing');
+            const skillItems = allItems.filter(i => i.category === 'skill');
+
+            let filteredSmithing = smithingItems;
+            let filteredSkill = skillItems;
+
+            // 应用过滤器
+            if (currentFilter === 'collected') {
+                filteredSmithing = smithingItems.filter(i => collectedIds.has(i.id));
+                filteredSkill = skillItems.filter(i => collectedIds.has(i.id));
+            } else if (currentFilter === 'forged') {
+                filteredSmithing = smithingItems.filter(i => forgedIds.has(i.id));
+                filteredSkill = skillItems.filter(i => forgedIds.has(i.id));
+            } else if (currentFilter === 'weapon') {
+                filteredSmithing = smithingItems.filter(i => i.type === 'weapon');
+                filteredSkill = [];
+            } else if (currentFilter === 'armor') {
+                filteredSmithing = smithingItems.filter(i => i.type === 'armor' || i.type === 'helmet');
+                filteredSkill = [];
+            }
+
+            // 渲染制作书
+            const smithingGrid = document.getElementById('smithingGrid');
+            smithingGrid.innerHTML = '';
+
+            if (filteredSmithing.length === 0) {
+                smithingGrid.innerHTML = '<p style="text-align: center; color: #888; padding: 40px;">没有找到符合条件的制作书</p>';
+            } else {
+                filteredSmithing.forEach(item => {
+                    const isCollected = collectedIds.has(item.id);
+                    const isForged = forgedIds.has(item.id);
+                    const badge = `badge-${item.type}`;
+                    const dlc = item.name.includes('DLC') ? '<span class="badge badge-dlc">DLC</span>' : '';
+
+                    let statusBadge = '';
+                    if (isCollected && isForged) {
+                        statusBadge = '<span class="badge" style="background: #9b59b6;">物品栏+锻造厂</span>';
+                    } else if (isForged) {
+                        statusBadge = '<span class="badge" style="background: #2ecc71;">锻造厂已解锁</span>';
+                    } else if (isCollected) {
+                        statusBadge = '<span class="badge" style="background: #e74c3c;">物品栏</span>';
                     }
-                    
-                    document.getElementById('statsGrid').style.display = 'grid';
-                    document.getElementById('controls').style.display = 'flex';
-                    renderItems();
-                } catch (err) {
-                    alert('文件解析失败: ' + err.message);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        
-        function parseJsonData(json) {
-            collectedIds = new Set();
-            if (json.items && Array.isArray(json.items)) {
-                json.items.forEach(item => {
-                    if (item.id) {
-                        collectedIds.add(item.id.toString(16).toUpperCase().padStart(4, '0'));
-                    }
+
+                    // 获取掉落数据
+                    const dropData = SMITHING_DROPS[item.id] || {};
+                    const dropInfo = dropData.drop ? `<div class="item-drop"><div class="item-drop-label">📍 掉落位置</div><div class="item-drop-text">${dropData.drop.replace(/\n/g, '<br>')}</div></div>` : '';
+                    const noteInfo = dropData.note ? `<div class="item-note">💡 ${dropData.note}</div>` : '';
+
+                    const card = document.createElement('div');
+                    card.className = `item-card ${isForged ? 'forged' : ''} ${isCollected ? 'collected' : ''}`;
+                    card.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-id">${item.id}</span>
+                        </div>
+                        <div class="item-info">
+                            <span class="item-category ${badge}">${item.typeLabel}</span>
+                            ${dlc}
+                            ${statusBadge}
+                        </div>
+                        ${dropInfo}
+                        ${noteInfo}
+                    `;
+                    smithingGrid.appendChild(card);
                 });
             }
-        }
-        
-        function parseBinaryData(data) {
-            collectedIds = new Set();
-            const header = new TextDecoder().decode(data.slice(0, 7));
-            if (header !== 'NIOHUSR') {
-                throw new Error('非仁王2存档文件或文件已加密');
+
+            // 渲染秘传书
+            const skillGrid = document.getElementById('skillGrid');
+            skillGrid.innerHTML = '';
+
+            if (filteredSkill.length === 0) {
+                skillGrid.innerHTML = '<p style="text-align: center; color: #888; padding: 40px;">没有找到符合条件的秘传书</p>';
+            } else {
+                filteredSkill.forEach(item => {
+                    const isCollected = collectedIds.has(item.id);
+
+                    const card = document.createElement('div');
+                    card.className = `item-card ${isCollected ? 'collected' : ''}`;
+                    card.innerHTML = `
+                        <div class="item-header">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-id">${item.id}</span>
+                        </div>
+                        <div class="item-info">
+                            <span class="item-category" style="background: rgba(155, 89, 182, 0.2); color: #9b59b6;">${item.typeLabel}</span>
+                        </div>
+                    `;
+                    skillGrid.appendChild(card);
+                });
             }
-            
-            const ITEM_START = 0x105EC8;
-            const ITEM_SIZE = 0x88;
-            const ITEM_SLOTS = 900;
-            
-            for (let i = 0; i < ITEM_SLOTS; i++) {
-                const offset = ITEM_START + (i * ITEM_SIZE);
-                if (offset + 4 > data.length) break;
-                const id = (data[offset + 1] << 8) | data[offset];
-                if (id > 0) {
-                    collectedIds.add(id.toString(16).toUpperCase().padStart(4, '0'));
-                }
-            }
+
+            document.getElementById('smithingSection').textContent = `制作书 (${filteredSmithing.length})`;
+            document.getElementById('skillSection').textContent = `秘传书 (${filteredSkill.length})`;
         }
-        
-        // 搜索
-        document.getElementById('searchInput').addEventListener('input', renderItems);
-        
-        // 过滤器
+
+        // 显示结果
+        function showResults() {
+            document.getElementById('results').classList.remove('hidden');
+            renderStats();
+            renderItems();
+        }
+
+        // 过滤器事件
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -567,9 +700,36 @@
                 renderItems();
             });
         });
-        
+
+        // 上传解密存档
+        document.getElementById('saveUpload').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.bin';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    console.log('上传文件:', file.name);
+                    try {
+                        await parseSaveFile(file);
+                        showResults();
+                    } catch (err) {
+                        alert('解析存档失败: ' + err.message);
+                    }
+                }
+            };
+            input.click();
+        });
+
+        // 查看完整列表（不上传文件）
+        document.getElementById('htmlUpload').addEventListener('click', () => {
+            collectedIds.clear();
+            forgedIds.clear();
+            showResults();
+        });
+
         // 初始化
-        initItems();
+        initData();
     </script>
 </body>
 </html>
