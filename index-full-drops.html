@@ -478,17 +478,25 @@
                         console.log('存档大小:', data.length, '字节');
 
                         // 解析物品栏
+                        // 存档是小端序存储：b0=低字节，b1=高字节
+                        // 文档ID是大端序数值 = (b1 << 8) | b0
                         const ITEM_START = 0x105EC8;
                         const ITEM_SIZE = 0x88;
                         const ITEM_SLOTS = 900;
 
                         for (let slot = 0; slot < ITEM_SLOTS; slot++) {
                             const offset = ITEM_START + (slot * ITEM_SIZE);
-                            const itemId = data[offset] | (data[offset + 1] << 8);
+                            const b0 = data[offset];      // 低字节
+                            const b1 = data[offset + 1];  // 高字节
 
-                            if (itemId !== 0) {
-                                const idHex = ((itemId & 0xFF) << 8 | (itemId >> 8)).toString(16).toUpperCase().padStart(4, '0');
-                                collectedIds.add(idHex);
+                            if (b0 === 0 && b1 === 0) continue;
+
+                            // 文档ID = 大端序数值
+                            const docId = ((b1 << 8) | b0).toString(16).toUpperCase().padStart(4, '0');
+                            
+                            // 只添加已知的制作书ID
+                            if (smithingIdToIndex[docId] !== undefined) {
+                                collectedIds.add(docId);
                             }
                         }
 
